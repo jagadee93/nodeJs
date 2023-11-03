@@ -40,9 +40,20 @@ App.use("/subdir", express.static(path.join(__dirname, "public")))
 App.use("/", require("./routes/root"));
 App.use("/subdir", require("./routes/subdir"));
 
+App.use("/api/employees", require("./routes/api/employees"))
+
 
 App.all("*", (req, res) => {
-    res.status(404).send("<h1>File not found<h1>")
+    res.status(404);
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, "views", "404.html"))
+    }
+    if (req.accepts("json")) {
+        res.json({ error: "file does not exists" })
+    } else {
+        res.send("File not Found")
+    }
+
 })
 
 //custom error handler 
