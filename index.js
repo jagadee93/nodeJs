@@ -3,28 +3,13 @@ const PORT = process.env.PORT || 3500;
 const express = require("express");
 const App = express();
 const cors = require("cors");
-const { requestLogger } = require("./middleware/eventLogger")
-const errorHandler = require("./middleware/errorHandler")
+const { requestLogger } = require("./middleware/eventLogger");
+const errorHandler = require("./middleware/errorHandler");
+const corsOptions = require("./config/corsOptions")
+
 //Request Logger ...
 App.use(requestLogger);
-
-
-const whiteList = ["https://www.yoursite.com", "http://localhost:5173"]
-
-const corsOptions = { //takes two options origin and optionsSuccessStatus
-    origin: (origin, callback) => {
-        if (whiteList.indexOf(origin) !== -1 || !origin) {
-            callback(null, true) //error,origin is allowed 
-        } else {
-            callback(new Error("Not allowed by CORS."))
-        }
-    },
-    optionsSuccessStatus: 200
-}
-
-
 App.use(cors(corsOptions))
-
 //for handling url encoded form data
 //and Content-Type:application/x-www-form-urlencoded
 App.use(express.urlencoded({ extended: false }));
@@ -33,12 +18,6 @@ App.use(express.json())
 
 //for serving static files 
 App.use("/", express.static(path.join(__dirname, 'public'))); //with out path also works
-App.use("/subdir", express.static(path.join(__dirname, "public")))
-
-
-
-App.use("/", require("./routes/root"));
-App.use("/subdir", require("./routes/subdir"));
 
 App.use("/api/employees", require("./routes/api/employees"))
 
