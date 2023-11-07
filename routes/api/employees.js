@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const verifyJwt = require("../../middleware/verifyJwt")
 const {
     getEmployees,
     addNewEmployee,
@@ -8,7 +9,7 @@ const {
 } = require("../../controllers/employeeController")
 router.route("/")
     .get(getEmployees)
-    .post(addNewEmployee)
+    .post(addNewEmployee)//post(verifyJwt, addNewEmployee)
     .put(editEmployee)
     .delete(deleteEmployee);
 

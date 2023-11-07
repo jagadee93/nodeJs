@@ -9,7 +9,6 @@ const Data = {
     async save() {
         if (this.employees) {
             const SEmployees = JSON.stringify(this.employees)
-            console.log(SEmployees)
             await fsPromises.writeFile(path.join(__dirname, "..", "model", "employees.json"), SEmployees);
         }
         return
