@@ -21,7 +21,7 @@ const verifyRefreshToken = (req, res) => {
     const refreshToken = cookies?.jwt;
     const foundUser = userData.users.find((user) => user.refreshToken === refreshToken);
     if (!foundUser) return res.sendStatus(403);
-
+    const roles = Object.values(foundUser.roles)
     //user found evaluate refreshToken
 
     try {
@@ -30,9 +30,14 @@ const verifyRefreshToken = (req, res) => {
             (err, decoded) => {
                 if (err) return res.sendStatus(403);
                 const accessToken = jwt.sign(
-                    { email: foundUser.email },
+                    {
+                        "UserInfo": {
+                            "email": foundUser.email,
+                            "roles": roles
+                        }
+                    },
                     process.env.ACCESS_TOKEN_SECRET,
-                    { expiresIn: "5m" }
+                    { expiresIn: "5m", algorithm: "HS256" }
                 );
                 res.json(accessToken)
             })

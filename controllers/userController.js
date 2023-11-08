@@ -24,7 +24,12 @@ const RegisterUser = async (req, res) => {
         const hashedPwd = await bcrypt.hash(password, 10)
         console.log(hashedPwd)
         const newUser = {
-            user, password: hashedPwd, email
+            user,
+            password: hashedPwd,
+            email,
+            roles: {
+                User: 2001
+            }
         }
         userData.setUsers([...userData.users, newUser]);
         await userData.save();
@@ -48,12 +53,16 @@ const userLogin = async (req, res) => {
         console.log(result)
         if (!result) return res.status(401).json({ "message": "password is incorrect" })
         //create Jwt
+        const roles = Object.values(foundUser.roles); //gives values 
         const accessToken = jwt.sign(
             {
-                email: foundUser.email
+                "UserInfo": {
+                    "email": foundUser.email,
+                    "roles": roles
+                }
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "5m" }
+            { expiresIn: "5m", algorithm: "HS256" }
         )
 
         const refreshToken = jwt.sign(
@@ -66,7 +75,7 @@ const userLogin = async (req, res) => {
 
         const updatedUsers = userData.users.map((user) => {
             if (user.email === foundUser.email) {
-                return { ...user, accessToken, refreshToken }
+                return { ...user, refreshToken }
             }
             return user
         });
